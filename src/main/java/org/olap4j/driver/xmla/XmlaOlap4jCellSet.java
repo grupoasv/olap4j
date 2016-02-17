@@ -128,7 +128,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      *
      * @throws OlapException on error
      */
-    void populate() throws OlapException {
+    List<Object> populate() throws OlapException {
         byte[] bytes = olap4jStatement.getBytes();
 
         Document doc;
@@ -209,16 +209,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         //      <Cell/>
         //      ...
         //   </CellData>
-        final Element root =
-            findChild(returnElement, MDDATASET_NS, "root");
-
-        if (olap4jStatement instanceof XmlaOlap4jPreparedStatement) {
-            this.metaData =
-                ((XmlaOlap4jPreparedStatement) olap4jStatement)
-                    .cellSetMetaData;
-        } else {
-            this.metaData = createMetaData(root);
-        }
+        final Element root = findChild(returnElement, MDDATASET_NS, "root");
 
         // todo: use CellInfo element to determine mapping of cell properties
         // to XML tags
@@ -230,143 +221,76 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         //  </CellInfo>
         final Element axesNode = findChild(root, MDDATASET_NS, "Axes");
 
-        // First pass, gather up a list of member unique names to fetch
-        // all at once.
-        //
-        // NOTE: This approach allows the driver to fetch a large number
-        // of members in one round trip, which is much more efficient.
-        // However, if the axis has a very large number of members, the map
-        // may use too much memory. This is an unresolved issue.
-        final MetadataReader metadataReader =
-            metaData.cube.getMetadataReader();
-        final Map<String, XmlaOlap4jMember> memberMap =
-            new HashMap<String, XmlaOlap4jMember>();
-        List<String> uniqueNames = new ArrayList<String>();
-        for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
-            final Element tuplesNode =
-                findChild(axisNode, MDDATASET_NS, "Tuples");
+        final List<Element> axisList = findChildren(axesNode, MDDATASET_NS, "Axis");
+        final List<Element> columns = findChildren(findChild(axisList.get(0), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
+        final List<Element> rows = findChildren(findChild(axisList.get(1), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
 
-            for (Element tupleNode
-                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
-            {
-                for (Element memberNode
-                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
-                {
-                    final String uname = stringElement(memberNode, "UName");
-                    uniqueNames.add(uname);
+
+        final Element _cellDataNode = findChild(root, MDDATASET_NS, "CellData");
+        final List<Element> cellsAux = findChildren(_cellDataNode, MDDATASET_NS, "Cell");
+        final Map<Integer, Element> cells = new HashMap<Integer, Element>();
+
+        for (Element cell : cellsAux) {
+            final int cellOrdinal = Integer.parseInt(cell.getAttribute("CellOrdinal"));
+            cells.put(cellOrdinal, cell);
+        }
+
+        List<Object> rowList = new ArrayList<Object>();
+
+
+        final Iterator<Element> rowsIterator = rows.iterator();
+
+        int ordinal = 0;
+        while(rowsIterator.hasNext()) {
+            final ArrayList<Object> row = new ArrayList<Object>();
+            final List<Element> rowMembers = findChildren(rowsIterator.next(), MDDATASET_NS, "Member");
+
+            final Iterator<Element> rowMembersIterator = rowMembers.iterator();
+            while(rowMembersIterator.hasNext()) {
+                final Element rowMember = rowMembersIterator.next();
+                final Map<String, Object> cellData = new HashMap<String, Object>();
+
+                cellData.put("uName", stringElement(rowMember, "UName"));
+                cellData.put("caption", stringElement(rowMember, "Caption"));
+                cellData.put("lName", stringElement(rowMember, "LName"));
+                cellData.put("memberCaption", stringElement(rowMember, "MEMBER_CAPTION"));
+                cellData.put("memberUName", stringElement(rowMember, "MEMBER_UNIQUE_NAME"));
+
+                row.add(cellData);
+            }
+
+            final Iterator<Element> columnsIterator = columns.iterator();
+            while(columnsIterator.hasNext()) {
+                final Element column = findChild(columnsIterator.next(), MDDATASET_NS, "Member");
+
+                final Element cell = cells.get(ordinal++);
+
+                Map<String, Object> cellData = new HashMap<String, Object>();
+                cellData.put("uName", stringElement(column, "UName"));
+                cellData.put("caption", stringElement(column, "Caption"));
+
+                Object typedValue = null;
+                String fmtValue = null;
+                String formatString = null;
+
+                if(cell != null) {
+                    typedValue = getTypedValue(cell);
+                    fmtValue = stringElement(cell, "FmtValue");
+                    formatString = stringElement(cell, "FormatString");
                 }
+
+
+                cellData.put("value", typedValue);
+                cellData.put("formattedValue", fmtValue);
+                cellData.put("formatString", formatString);
+
+                row.add(cellData);
             }
+
+            rowList.add(row);
         }
 
-        // Fetch all members on all axes. Hopefully it can all be done in one
-        // round trip, or they are in cache already.
-        metadataReader.lookupMembersByUniqueName(uniqueNames, memberMap);
-
-        // Second pass, populate the axis.
-        final Map<Property, Object> propertyValues =
-            new HashMap<Property, Object>();
-        for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
-            final String axisName = axisNode.getAttribute("name");
-            final Axis axis = lookupAxis(axisName);
-            final ArrayList<Position> positions = new ArrayList<Position>();
-            final XmlaOlap4jCellSetAxis cellSetAxis =
-                new XmlaOlap4jCellSetAxis(
-                    this, axis, Collections.unmodifiableList(positions));
-            if (axis.isFilter()) {
-                filterAxis = cellSetAxis;
-            } else {
-                axisList.add(cellSetAxis);
-            }
-            final Element tuplesNode =
-                findChild(axisNode, MDDATASET_NS, "Tuples");
-            for (Element tupleNode
-                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
-            {
-                final List<Member> members = new ArrayList<Member>();
-                for (Element memberNode
-                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
-                {
-                    String hierarchyName =
-                        memberNode.getAttribute("Hierarchy");
-                    final String uname = stringElement(memberNode, "UName");
-                    XmlaOlap4jMemberBase member = memberMap.get(uname);
-                    if (member == null) {
-                        final String caption =
-                            stringElement(memberNode, "Caption");
-                        final int lnum = integerElement(memberNode, "LNum");
-                        final Hierarchy hierarchy =
-                            lookupHierarchy(metaData.cube, hierarchyName);
-                        final Level level = hierarchy.getLevels().get(lnum);
-                        member = new XmlaOlap4jSurpriseMember(
-                            this, level, hierarchy, lnum, caption, uname);
-                    }
-                    propertyValues.clear();
-                    for (Element childNode : childElements(memberNode)) {
-                        XmlaOlap4jCellSetMemberProperty property =
-                            ((XmlaOlap4jCellSetAxisMetaData)
-                                cellSetAxis.getAxisMetaData()).lookupProperty(
-                                    hierarchyName,
-                                    childNode.getLocalName());
-                        if (property != null) {
-                            String value = childNode.getTextContent();
-                            propertyValues.put(property, value);
-                        }
-                    }
-                    if (!propertyValues.isEmpty()) {
-                        member =
-                            new XmlaOlap4jPositionMember(
-                                member, propertyValues);
-                    }
-                    members.add(member);
-                }
-                positions.add(
-                    new XmlaOlap4jPosition(
-                        members, positions.size()));
-            }
-        }
-
-        // If XMLA did not return a filter axis, it means that there was no
-        // WHERE. This is equivalent to a slicer axis with one tuple that has
-        // zero positions. (Versions of Mondrian before 3.4 do, in fact, return
-        // a slicer axis with one empty position. This CellSet should behave the
-        // same.)
-        if (filterAxis == null) {
-            filterAxis =
-                new XmlaOlap4jCellSetAxis(
-                    this,
-                    Axis.FILTER,
-                    Collections.<Position>singletonList(
-                        new XmlaOlap4jPosition(
-                            Collections.<Member>emptyList(),
-                            0)));
-        }
-
-        final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");
-        for (Element cell : findChildren(cellDataNode, MDDATASET_NS, "Cell")) {
-            propertyValues.clear();
-            final int cellOrdinal =
-                Integer.valueOf(cell.getAttribute("CellOrdinal"));
-            final Object value = getTypedValue(cell);
-            final String formattedValue = stringElement(cell, "FmtValue");
-            final String formatString = stringElement(cell, "FormatString");
-            Olap4jUtil.discard(formatString);
-            for (Element element : childElements(cell)) {
-                String tag = element.getLocalName();
-                final Property property =
-                    metaData.propertiesByTag.get(tag);
-                if (property != null) {
-                    propertyValues.put(property, element.getTextContent());
-                }
-            }
-            cellMap.put(
-                cellOrdinal,
-                new XmlaOlap4jCell(
-                    this,
-                    cellOrdinal,
-                    value,
-                    formattedValue,
-                    propertyValues));
-        }
+        return rowList;
     }
 
     /**

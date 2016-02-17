@@ -428,21 +428,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (databaseName == null) {
             throw new OlapException("Database name cannot be null.");
         }
-        this.olap4jDatabase =
+        /*this.olap4jDatabase =
             (XmlaOlap4jDatabase) getOlapDatabases().get(databaseName);
         if (this.olap4jDatabase == null) {
             throw new OlapException(
                 "No database named "
                 + databaseName
                 + " could be found.");
-        }
+        }*/
         this.databaseName = databaseName;
         this.olap4jCatalog = null;
         this.olap4jSchema = null;
     }
 
     public String getDatabase() throws OlapException {
-        return getOlapDatabase().getName();
+        return this.databaseName;
     }
 
     public Database getOlapDatabase() throws OlapException {
@@ -481,20 +481,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (catalogName == null) {
             throw new OlapException("Catalog name cannot be null.");
         }
-        this.olap4jCatalog =
+        /*this.olap4jCatalog =
             (XmlaOlap4jCatalog) getOlapCatalogs().get(catalogName);
         if (this.olap4jCatalog == null) {
             throw new OlapException(
                 "No catalog named "
                 + catalogName
                 + " could be found.");
-        }
+        }*/
         this.catalogName = catalogName;
         this.olap4jSchema = null;
     }
 
     public String getCatalog() throws OlapException {
-        return getOlapCatalog().getName();
+        return this.catalogName;
     }
 
     public Catalog getOlapCatalog() throws OlapException {

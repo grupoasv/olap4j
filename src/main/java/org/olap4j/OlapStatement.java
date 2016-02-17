@@ -21,6 +21,7 @@ import org.olap4j.mdx.SelectNode;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 /**
  * Object used for statically executing an MDX statement and returning a
@@ -55,6 +56,8 @@ public interface OlapStatement extends Statement, OlapWrapper {
      * or another thread cancels the statement (see {@link #cancel()})
      */
     CellSet executeOlapQuery(String mdx) throws OlapException;
+
+    List<Object> executeASVOlapQuery(String mdx) throws OlapException;
 
     /**
      * Executes an OLAP statement expressed as a parse tree.
