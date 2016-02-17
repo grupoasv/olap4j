@@ -1996,10 +1996,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             int propertyType = integerElement(row, "PROPERTY_TYPE");
             Set<Property.TypeFlag> type =
                 Property.TypeFlag.DICTIONARY.forMask(propertyType);
-            list.add(
-                new XmlaOlap4jProperty(
-                    uniqueName, name, caption, description, datatype, type,
-                    contentType));
+
+                if(uniqueName != null) {
+                  list.add(
+                      new XmlaOlap4jProperty(
+                          uniqueName, name, caption, description, datatype, type,
+                          contentType));
+                }
         }
     }
 
