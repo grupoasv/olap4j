@@ -6,3 +6,5 @@ jdk:
 branches:
   only:
     - olap4j2
+script:
+  - mvn -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings settings.xml -T 1C
