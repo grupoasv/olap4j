@@ -14,7 +14,7 @@ branches:
     - olap4j2
 
 script:
-  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U -B clean install deploy --settings settings.xml -T 1C
+  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U -B clean install deploy -T 1C
 
 # cache maven local repository
 cache:
