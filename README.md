@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/olap4j/olap4j.png)](https://travis-ci.org/olap4j/olap4j)
+[![Build Status](https://travis-ci.org/grupoasv/olap4j.svg?branch=olap4j2)](https://travis-ci.org/grupoasv/olap4j)
 
 # olap4j #
 
@@ -84,7 +84,7 @@ Connection connection =
 
 The core API of olap4j version 1.0 is a Long Term Support (LTS) release,
 but some parts of the olap4j project will remain considered as experimental,
-thus subject to change in future releases. 
+thus subject to change in future releases.
 
 Core packages are as follows:
 * <a href="http://www.olap4j.org/api/org/olap4j/driver/xmla/package-summary.html">org.olap4j.driver.xmla</a> - Generic XML/A driver.
