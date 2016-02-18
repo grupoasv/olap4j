@@ -23,4 +23,4 @@ cache:
 
 env:
   global:
-  - secure: "om7CMxFwIophROZ0v80Mu52hqTkOJfbr1JpKv3dh8r/+LbRdBm/YgR0VNR1s8GI5aNNWwEFsRBZSuAdDfJXa6p5HnfkdhKECmAyb5hlreLmuLERSkjFH4lNayL2p9qUq8YbKacg6sXUvYr6+w/dI4RI2rkFpduet9ql5lRFJcKU="
+  - secure: om7CMxFwIophROZ0v80Mu52hqTkOJfbr1JpKv3dh8r/+LbRdBm/YgR0VNR1s8GI5aNNWwEFsRBZSuAdDfJXa6p5HnfkdhKECmAyb5hlreLmuLERSkjFH4lNayL2p9qUq8YbKacg6sXUvYr6+w/dI4RI2rkFpduet9ql5lRFJcKU=

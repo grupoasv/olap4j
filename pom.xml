@@ -57,13 +57,13 @@
   </properties>
 
   <!-- Environment settings. -->
-  <issueManagement/>
+  <!--<issueManagement/>-->
 
-  <scm>
-    <connection>scm:git:git://github.com/olap4j/olap4j.git</connection>
-    <developerConnection>scm:git:git@github.com:olap4j/olap4j.git</developerConnection>
-    <url>http://github.com/olap4j/olap4j/tree/master</url>
-  </scm>
+  <!--<scm>-->
+    <!--<connection>scm:git:git://github.com/olap4j/olap4j.git</connection>-->
+    <!--<developerConnection>scm:git:git@github.com:olap4j/olap4j.git</developerConnection>-->
+    <!--<url>http://github.com/olap4j/olap4j/tree/master</url>-->
+  <!--</scm>-->
 
   <!-- Dependencies. -->
   <dependencies>
