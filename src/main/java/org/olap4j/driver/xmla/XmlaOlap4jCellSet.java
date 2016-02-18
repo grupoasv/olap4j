@@ -17,6 +17,7 @@
 */
 package org.olap4j.driver.xmla;
 
+import com.grupoasv.enums.ElementType;
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
@@ -250,6 +251,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 final Element rowMember = rowMembersIterator.next();
                 final Map<String, Object> cellData = new HashMap<String, Object>();
 
+                cellData.put("type", ElementType.ROW);
                 cellData.put("uName", stringElement(rowMember, "UName"));
                 cellData.put("caption", stringElement(rowMember, "Caption"));
                 cellData.put("lName", stringElement(rowMember, "LName"));
@@ -266,6 +268,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 final Element cell = cells.get(ordinal++);
 
                 Map<String, Object> cellData = new HashMap<String, Object>();
+                cellData.put("type", ElementType.COLUMN);
                 cellData.put("uName", stringElement(column, "UName"));
                 cellData.put("caption", stringElement(column, "Caption"));
 
