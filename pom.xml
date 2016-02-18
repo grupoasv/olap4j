@@ -293,7 +293,6 @@
           </includes>
           <repositoryName>mvn-repo</repositoryName>      <!-- github repo name -->
           <repositoryOwner>grupoasv</repositoryOwner>    <!-- github username  -->
-          <server>github</server>
         </configuration>
         <executions>
           <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
