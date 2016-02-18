@@ -281,8 +281,7 @@
         <artifactId>site-maven-plugin</artifactId>
         <version>${maven.site.plugin.version}</version>
         <configuration>
-          <message>Maven artifacts for ${project.name} ${project.version}
-          </message>  <!-- git commit message -->
+          <message>Maven artifacts for ${project.name} ${project.version}</message>  <!-- git commit message -->
           <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
           <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
           <merge>true</merge>
@@ -308,8 +307,7 @@
         <artifactId>maven-deploy-plugin</artifactId>
         <version>${maven.deploy.plugin.version}</version>
         <configuration>
-          <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
-          </altDeploymentRepository>
+          <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
         </configuration>
       </plugin>
     </plugins>
