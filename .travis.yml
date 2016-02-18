@@ -1,26 +1,17 @@
 sudo: false
-
 language: java
 jdk:
-  - oraclejdk7
-#  - oraclejdk8
-#  - openjdk6
-
-# Build everything in 'script' phase
+- oraclejdk7
 install: /bin/true
-
 branches:
   only:
-    - olap4j2
-
+  - olap4j2
 script:
-  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings  settings.xml -T 1C -B -V
-
-# cache maven local repository
+- mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient
+  -U clean verify deploy --settings  settings.xml -T 1C -B -V
 cache:
   directories:
-    - $HOME/.m2
-
+  - $HOME/.m2
 env:
   global:
-  - secure: om7CMxFwIophROZ0v80Mu52hqTkOJfbr1JpKv3dh8r/+LbRdBm/YgR0VNR1s8GI5aNNWwEFsRBZSuAdDfJXa6p5HnfkdhKECmAyb5hlreLmuLERSkjFH4lNayL2p9qUq8YbKacg6sXUvYr6+w/dI4RI2rkFpduet9ql5lRFJcKU=
+    secure: FyBSgN57T1G045bY5EtQbke8zS2GWpYycIDIAR+uX0raATRJrqH4iXx/mactmZt56NODOnc4RVEe4U8sCzIvjsqpR3s5dBL7q9pz6OLm//FeX+ihaXn+GDHVIYc0fUeS9GTpOWZ1mY6BSQp17N85xTIlwetPtRqM1hM8u/puFGXm1SrRfKMWYc07DaUR4vK/CXOYVY8ri1K5DjXONUxSixaftK7ENrOxaFkiZjkyGr5YUzsqXu2PPB71iRQ+3HQeLeCI53YCZUi6zzWQTHYQqmR5mrLiMVTcatANFSaSN0S43hi/8820/q7/OD1G+J7sn20iPD158Az7jr46M7HgMDgD3yEmvHLyJ8JcLmxJUTcl95k+ysjB+yfVFuiRjKFfsLb3uWmG2YaK5OkZeKXo2zg1LHNZTObgc4sYjkmDOlFwWrpTamLC0QH66XPDbzuMn5V//YAyd7+9dlry5Pcf9v7axhF58V56Rbt/OjpFI4JnMy40IOvIX/C2Kd/JObPare9da1PWe48eX6rKLE7VyYL0eG662HKorG3hrsfz7z+I1McG2cxI/5ordVWv/8D9TW4gFoyWMG5ih+baP4lLDhyC3DxKSNV29M27dLm2QbfySolcNbv68v27tI9KUr+e5zf+8dvisFLou0QP52qRNSutUAhGdYipK4GeLEFlLX8=
