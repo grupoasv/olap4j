@@ -1,10 +1,17 @@
+sudo: false
+
 language: java
 jdk:
   - oraclejdk7
 #  - oraclejdk8
 #  - openjdk6
+
+# Build everything in 'script' phase
+install: /bin/true
+
 branches:
   only:
     - olap4j2
+
 script:
-  - mvn -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings settings.xml -T 1C
+  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings settings.xml -T 1C -B -V
