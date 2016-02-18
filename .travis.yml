@@ -14,9 +14,13 @@ branches:
     - olap4j2
 
 script:
-  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings settings.xml -T 1C -B -V
+  - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings  settings.xml -T 1C -B -V
 
 # cache maven local repository
 cache:
   directories:
     - $HOME/.m2
+
+env:
+  global:
+  - secure: "om7CMxFwIophROZ0v80Mu52hqTkOJfbr1JpKv3dh8r/+LbRdBm/YgR0VNR1s8GI5aNNWwEFsRBZSuAdDfJXa6p5HnfkdhKECmAyb5hlreLmuLERSkjFH4lNayL2p9qUq8YbKacg6sXUvYr6+w/dI4RI2rkFpduet9ql5lRFJcKU="
