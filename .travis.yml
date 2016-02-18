@@ -15,3 +15,8 @@ branches:
 
 script:
   - mvn -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.wagon.provider.http=httpclient -U clean verify deploy --settings settings.xml -T 1C -B -V
+
+# cache maven local repository
+cache:
+  directories:
+    - $HOME/.m2
