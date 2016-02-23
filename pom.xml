@@ -5,7 +5,7 @@
   <!-- The basics. -->
   <groupId>org.olap4j</groupId>
   <artifactId>olap4j</artifactId>
-  <version>2.0.1-ASV</version>
+  <version>2.0.2-ASV</version>
   <packaging>jar</packaging>
 
   <!-- More project information. -->

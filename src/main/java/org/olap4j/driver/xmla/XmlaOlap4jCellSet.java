@@ -17,7 +17,6 @@
 */
 package org.olap4j.driver.xmla;
 
-import com.grupoasv.enums.ElementType;
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
@@ -224,7 +223,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         final List<Element> axisList = findChildren(axesNode, MDDATASET_NS, "Axis");
         final List<Element> columns = findChildren(findChild(axisList.get(0), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
-        final List<Element> rows = findChildren(findChild(axisList.get(1), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
+        final List<Element> rows = axisList.size() <= 2 ? Collections.<Element>emptyList() : findChildren(findChild(axisList.get(1), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
 
 
         final Element _cellDataNode = findChild(root, MDDATASET_NS, "CellData");
@@ -236,6 +235,23 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             cells.put(cellOrdinal, cell);
         }
 
+        if(!columns.isEmpty() && !rows.isEmpty()) {
+            return processRowsAndColumns(columns, rows, cells);
+        } else {
+            return processOnlyColumns(columns, cells);
+
+        }
+    }
+
+    private List<Object> processOnlyColumns(List<Element> columns, Map<Integer, Element> cells) throws OlapException {
+        List<Object> rowList = new ArrayList<Object>();
+        final ArrayList<Object> row = new ArrayList<Object>();
+        processColumns(columns, cells, 0, row);
+        rowList.add(row);
+        return rowList;
+    }
+
+    private List<Object> processRowsAndColumns(List<Element> columns, List<Element> rows, Map<Integer, Element> cells) throws OlapException {
         List<Object> rowList = new ArrayList<Object>();
 
 
@@ -251,7 +267,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 final Element rowMember = rowMembersIterator.next();
                 final Map<String, Object> cellData = new HashMap<String, Object>();
 
-                cellData.put("type", ElementType.ROW);
+                cellData.put("type", com.grupoasv.enums.ElementType.ROW);
                 cellData.put("uName", stringElement(rowMember, "UName"));
                 cellData.put("caption", stringElement(rowMember, "Caption"));
                 cellData.put("lName", stringElement(rowMember, "LName"));
@@ -261,39 +277,43 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 row.add(cellData);
             }
 
-            final Iterator<Element> columnsIterator = columns.iterator();
-            while(columnsIterator.hasNext()) {
-                final Element column = findChild(columnsIterator.next(), MDDATASET_NS, "Member");
-
-                final Element cell = cells.get(ordinal++);
-
-                Map<String, Object> cellData = new HashMap<String, Object>();
-                cellData.put("type", ElementType.COLUMN);
-                cellData.put("uName", stringElement(column, "UName"));
-                cellData.put("caption", stringElement(column, "Caption"));
-
-                Object typedValue = null;
-                String fmtValue = null;
-                String formatString = null;
-
-                if(cell != null) {
-                    typedValue = getTypedValue(cell);
-                    fmtValue = stringElement(cell, "FmtValue");
-                    formatString = stringElement(cell, "FormatString");
-                }
-
-
-                cellData.put("value", typedValue);
-                cellData.put("formattedValue", fmtValue);
-                cellData.put("formatString", formatString);
-
-                row.add(cellData);
-            }
+            ordinal = processColumns(columns, cells, ordinal, row);
 
             rowList.add(row);
         }
-
         return rowList;
+    }
+
+    private int processColumns(List<Element> columns, Map<Integer, Element> cells, int ordinal, ArrayList<Object> row) throws OlapException {
+        final Iterator<Element> columnsIterator = columns.iterator();
+        while(columnsIterator.hasNext()) {
+            final Element column = findChild(columnsIterator.next(), MDDATASET_NS, "Member");
+
+            final Element cell = cells.get(ordinal++);
+
+            Map<String, Object> cellData = new HashMap<String, Object>();
+            cellData.put("type", com.grupoasv.enums.ElementType.COLUMN);
+            cellData.put("uName", stringElement(column, "UName"));
+            cellData.put("caption", stringElement(column, "Caption"));
+
+            Object typedValue = null;
+            String fmtValue = null;
+            String formatString = null;
+
+            if(cell != null) {
+                typedValue = getTypedValue(cell);
+                fmtValue = stringElement(cell, "FmtValue");
+                formatString = stringElement(cell, "FormatString");
+            }
+
+
+            cellData.put("value", typedValue);
+            cellData.put("formattedValue", fmtValue);
+            cellData.put("formatString", formatString);
+
+            row.add(cellData);
+        }
+        return ordinal;
     }
 
     /**
