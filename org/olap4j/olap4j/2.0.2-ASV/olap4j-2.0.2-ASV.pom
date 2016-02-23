@@ -1,0 +1,324 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The basics. -->
+  <groupId>org.olap4j</groupId>
+  <artifactId>olap4j</artifactId>
+  <version>2.0.2-ASV</version>
+  <packaging>jar</packaging>
+
+  <!-- More project information. -->
+  <name>olap4j</name>
+  <description>Open Java API for OLAP</description>
+  <url>http://github.com/olap4j/olap4j</url>
+  <inceptionYear>2006</inceptionYear>
+  <organization>
+    <name>olap4j</name>
+    <url>http://www.olap4j.org</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>julianhyde</id>
+      <name>Julian Hyde</name>
+      <email>julianhyde@gmail.com</email>
+      <url>https://github.com/julianhyde</url>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-8</timezone>
+      <properties/>
+    </developer>
+    <developer>
+      <id>lucboudreau</id>
+      <name>Luc Boudreau</name>
+      <url>https://github.com/lucboudreau</url>
+      <roles>
+        <role>project manager</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
+      <properties/>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
+    <maven.site.plugin.version>0.11</maven.site.plugin.version>
+  </properties>
+
+  <!-- Environment settings. -->
+  <!--<issueManagement/>-->
+
+  <!--<scm>-->
+    <!--<connection>scm:git:git://github.com/olap4j/olap4j.git</connection>-->
+    <!--<developerConnection>scm:git:git@github.com:olap4j/olap4j.git</developerConnection>-->
+    <!--<url>http://github.com/olap4j/olap4j/tree/master</url>-->
+  <!--</scm>-->
+
+  <!-- Dependencies. -->
+  <dependencies>
+    <dependency>
+      <groupId>com.sun</groupId>
+      <artifactId>rt-jdk1.5</artifactId>
+      <version>1.5.0_22</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.java.openjdk</groupId>
+      <artifactId>rt-java6</artifactId>
+      <version>1.6.0_24</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>mondrian</artifactId>
+      <version>4.0.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <links>
+            <link>http://docs.oracle.com/javase/7/docs/api/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <distributionManagement>
+    <repository>
+      <id>internal.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${project.build.directory}/mvn-repo</url>
+    </repository>
+  </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>pentaho</id>
+      <url>http://repo.pentaho.org/artifactory/repo/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>properties</id>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <excludes>
+            <exclude>**/FactoryJdbc3Impl.java</exclude>
+            <exclude>**/FactoryJdbc4Impl.java</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>compile-jdk15</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/FactoryJdbc4*.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/FactoryJdbc3Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose/>
+                <bootclasspath>${com.sun:rt-jdk1.5:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-jdk16</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/FactoryJdbc3*.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/FactoryJdbc4Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose/>
+                <bootclasspath>${net.java.openjdk:rt-java6:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>javacc</id>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/MdxParser.jj</include>
+              </includes>
+              <lookAhead>2</lookAhead>
+              <isStatic>false</isStatic>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>org/olap4j/**/*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>maven-replacer-plugin</artifactId>
+        <version>1.4.0</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <id>replace</id>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <file>src/main/resources/version/XmlaOlap4jDriverVersion.java.template</file>
+          <outputFile>target/generated-sources/javacc/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java</outputFile>
+          <replacements>
+            <replacement>
+              <token>@buildtime@</token>
+              <value>${maven.build.timestamp}</value>
+            </replacement>
+            <replacement>
+              <token>@pomversion@</token>
+              <value>${project.version}</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>${maven.site.plugin.version}</version>
+        <configuration>
+          <message>Maven artifacts for ${project.name} ${project.version}</message>  <!-- git commit message -->
+          <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+          <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+          <merge>true</merge>
+          <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+          <includes>
+            <include>**/*</include>
+          </includes>
+          <repositoryName>olap4j</repositoryName>      <!-- github repo name -->
+          <repositoryOwner>grupoasv</repositoryOwner>    <!-- github username  -->
+          <server>github</server>
+        </configuration>
+        <executions>
+          <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>${maven.deploy.plugin.version}</version>
+        <configuration>
+          <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>version/*</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+</project>
