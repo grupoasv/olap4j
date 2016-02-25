@@ -223,8 +223,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         final List<Element> axisList = findChildren(axesNode, MDDATASET_NS, "Axis");
         final List<Element> columns = findChildren(findChild(axisList.get(0), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
-        final List<Element> rows = axisList.size() <= 2 ? Collections.<Element>emptyList() : findChildren(findChild(axisList.get(1), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
-
+        List<Element> rows = findChildren(findChild(axisList.get(1), MDDATASET_NS, "Tuples"), MDDATASET_NS, "Tuple");
+        if (rows.size() == 1){
+            rows = Collections.<Element>emptyList();
+        }
 
         final Element _cellDataNode = findChild(root, MDDATASET_NS, "CellData");
         final List<Element> cellsAux = findChildren(_cellDataNode, MDDATASET_NS, "Cell");
